@@ -1,0 +1,457 @@
+
+<!-- saved from url=(0058)http://logic.stanford.edu/intrologic/notes/chapter_05.html -->
+<html><!--=======================================================================--><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+  <title>Chapter 5 - Propositional Resolution</title>
+  <style type="text/css">
+    @media print {table {page-break-inside:avoid}}
+  </style>
+</head>
+
+<!--=======================================================================-->
+
+<body style="background-color:#990000">
+  <center>
+    <table width="720" cellpadding="40" bgcolor="#ffffff">
+      <tbody><tr>
+        <td>
+
+<!--=======================================================================-->
+
+  <center>
+    <table width="100%" cellspacing="0" cellpadding="0">
+      <tbody><tr><td><br></td></tr>
+      <tr>
+        <td height="40" align="center">
+          <span style="font-size:18pt; text-align:center">C H A P T E R&nbsp;&nbsp;5</span>
+        </td>
+      </tr>
+    </tbody></table>
+    <table width="100%" height="60" cellspacing="1" cellpadding="0" bgcolor="#dddddd" border="1">
+      <tbody><tr>
+        <td height="30" align="center">
+          <span style="font-size:28pt;text-align:center">Propositional Resolution</span>
+        </td>
+      </tr>
+    </tbody></table>
+    <br>
+  </center>
+
+<!--=======================================================================-->
+
+<h3>5.1 <a name="section_05_05">Introduction</a></h3>
+
+<p><i>Propositional Resolution</i> is a powerful rule of inference for Propositional Logic.  Using Propositional Resolution (without axiom schemata or other rules of inference), it is possible to build a theorem prover that is sound and complete for all of Propositional Logic.  What's more, the search space using Propositional Resolution is much smaller than for standard Propositional Logic.</p>
+
+<p>This chapter is devoted entirely to Propositional Resolution.  We start with a look at clausal form, a variation of the language of Propositional Logic.  We then examine the resolution rule itself.  We close with some examples.</p>
+
+<!--=======================================================================-->
+
+<h3>5.2 <a name="section_05_02">Clausal Form</a></h3>
+
+<p>Propositional Resolution works only on expressions in <i>clausal form</i>.  Before the rule can be applied, the premises and conclusions must be converted to this form.  Fortunately, as we shall see, there is a simple procedure for making this conversion.</p>
+
+<p>A <i>literal</i> is either an atomic sentence or a negation of an atomic sentence.  For example, if <i>p</i> is a logical constant, the following sentences are both literals.</p>
+
+<center>
+<i>p</i><br>
+<i>¬p</i>
+</center>
+
+<p>A <i>clausal sentence</i> is either a literal or a disjunction of literals.  If <i>p</i> and <i>q</i> are logical constants, then the following are clausal sentences.</p>
+
+<center>
+<i>p</i><br>
+¬<i>p</i><br>
+<i>¬p</i> &#8744; <i>q</i>
+</center>
+
+<p>A <i>clause</i> is the set of literals in a clausal sentence.  For example, the following sets are the clauses corresponding to the clausal sentences above.</p>
+
+<center>
+{<i>p</i>}<br>
+{¬<i>p</i>}<br>
+{<i>¬p</i>, <i>q</i>}
+</center>
+
+<p>Note that the empty set {} is also a clause.  It is equivalent to an empty disjunction and, therefore, is unsatisfiable.  As we shall see, it is a particularly important special case.</p>
+
+<p>As mentioned earlier, there is a simple procedure for converting an arbitrary set of Propositional Logic sentences to an equivalent set of clauses.The conversion rules are summarized below and should be applied in order.</p>
+
+<p>1. Implications (I):</p>
+
+<center>
+  <table>
+    <tbody><tr>
+      <td width="80">&nbsp;</td>
+      <td width="60">&#966; &#8658; &#968;</td>
+      <td width="40" align="center">&#8594;</td>
+      <td width="140">¬&#966; &#8744; &#968;</td>
+    </tr>
+    <tr>
+      <td width="80">&nbsp;</td>
+      <td width="60">&#966; &#8656; &#968;</td>
+      <td width="40" align="center">&#8594;</td>
+      <td width="140">&#966; &#8744; ¬&#968;</td></tr>
+    <tr>
+      <td width="80">&nbsp;</td>
+      <td width="60">&#966; &#8660; &#968;</td>
+      <td width="40" align="center">&#8594;</td>
+      <td width="140">(¬&#966; &#8744; &#968;) &#8743; (&#966; &#8744; ¬&#968;)</td>
+    </tr>
+  </tbody></table>
+</center>
+
+<p>2. Negations (N):</p>
+
+<center>
+<table>
+<tbody><tr><td>¬¬&#966;</td><td width="40" align="center">&#8594;</td><td>&#966;</td></tr>
+<tr><td>¬(&#966; &#8743; &#968;)</td><td width="40" align="center">&#8594;</td><td>¬&#966; &#8744; ¬&#968;</td></tr>
+<tr><td>¬(&#966; &#8744; &#968;)</td><td width="40" align="center">&#8594;</td><td>¬&#966; &#8743; ¬&#968;</td></tr>
+</tbody></table>
+</center>
+
+<p>3. Distribution (D):</p>
+
+<center>
+<table>
+<tbody><tr><td>&#966; &#8744; (&#968; &#8743; &#967;)</td><td width="40" align="center">&#8594;</td><td>(&#966; &#8744; &#968;) &#8743; (&#966; &#8744; &#967;)</td></tr>
+<tr><td>(&#966; &#8743; &#968;) &#8744; &#967;</td><td width="40" align="center">&#8594;</td><td>(&#966; &#8744; &#967;) &#8743; (&#968; &#8744; &#967;)</td></tr>
+<tr><td>&#966; &#8744; (&#966;<sub>1</sub> &#8744; ... &#8744; &#966;<sub><i>n</i></sub>)</td><td width="40" align="center">&#8594;</td><td>&#966; &#8744; &#966;<sub>1</sub> &#8744; ... &#8744; &#966;<sub><i>n</i></sub></td></tr>
+<tr><td>(&#966;<sub>1</sub> &#8744; ... &#8744; &#966;<sub><i>n</i></sub>) &#8744; &#966;</td><td width="40" align="center">&#8594;</td><td>&#966;<sub>1</sub> &#8744; ... &#8744; &#966;<sub><i>n</i></sub> &#8744; &#966;</td></tr>
+<tr><td>&#966; &#8743; (&#966;<sub>1</sub> &#8743; ... &#8743; &#966;<sub><i>n</i></sub>)</td><td width="40" align="center">&#8594;</td><td>&#966; &#8743; &#966;<sub>1</sub> &#8743; ... &#8743; &#966;<sub><i>n</i></sub></td></tr>
+<tr><td>(&#966;<sub>1</sub> &#8743; ... &#8743; &#966;<sub><i>n</i></sub>) &#8743; &#966;</td><td width="40" align="center">&#8594;</td><td>&#966;<sub>1</sub> &#8743; ... &#8743; &#966;<sub><i>n</i></sub> &#8743; &#966;</td></tr>
+</tbody></table>
+</center>
+
+<p>4. Operators (O):</p>
+
+<center>
+  <table>
+    <tbody><tr>
+      <td width="50">&nbsp;</td>
+      <td width="90">&#966;<sub>1</sub> &#8744; ... &#8744; &#966;<sub><i>n</i></sub></td>
+      <td width="40" align="center">&#8594;</td>
+      <td width="140">{&#966;<sub>1</sub>, ... , &#966;<sub><i>n</i></sub>}</td>
+    </tr>
+    <tr>
+      <td width="50">&nbsp;</td>
+      <td width="90">&#966;<sub>1</sub> &#8743; ... &#8743; &#966;<sub><i>n</i></sub></td>
+      <td width="40" align="center">&#8594;</td>
+      <td width="140">{&#966;<sub>1</sub>}, ... , {&#966;<sub><i>n</i></sub>}</td></tr>
+  </tbody></table>
+</center>
+
+<p>As an example, consider the job of converting the sentence (<i>g</i> &#8743; (<i>r</i> &#8658; <i>f</i>)) to clausal form.  The conversion process is shown below.</p>
+
+<center>
+<table>
+<tbody><tr><td width="20"></td><td><i>g</i> &#8743; (<i>r</i> &#8658; <i>f</i>)</td></tr>
+<tr><td>I</td><td><i>g</i> &#8743; (¬<i>r</i> &#8744; <i>f</i>)</td></tr>
+<tr><td>N</td><td><i>g</i> &#8743; (¬<i>r</i> &#8744; <i>f</i>)</td></tr>
+<tr><td>D</td><td><i>g</i> &#8743; (¬<i>r</i> &#8744; <i>f</i>)</td></tr>
+<tr><td>O</td><td>{<i>g</i>}</td></tr>
+<tr><td></td><td>{¬<i>r</i>, <i>f</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>As a slightly more complicated case, consider the following conversion.  We start with the same sentence except that, in this case, it is negated.</p>
+
+<center>
+<table>
+<tbody><tr><td width="20"></td><td>¬(<i>g</i> &#8743; (<i>r</i> &#8658; <i>f</i>))</td></tr>
+<tr><td>I</td><td>¬(<i>g</i> &#8743; (¬<i>r</i> &#8744; <i>f</i>))</td></tr>
+<tr><td>N</td><td>¬<i>g</i> &#8744; ¬(¬<i>r</i> &#8744; <i>f</i>)</td></tr>
+<tr><td></td><td>¬<i>g</i> &#8744; (¬¬<i>r</i> &#8743; ¬<i>f</i>)</td></tr>
+<tr><td></td><td>¬<i>g</i> &#8744; (<i>r</i> &#8743; ¬<i>f</i>)</td></tr>
+<tr><td>D</td><td>(¬<i>g</i> &#8744; <i>r</i>) &#8743; (¬<i>g</i> &#8744; ¬<i>f</i>)</td></tr>
+<tr><td>O</td><td>{¬<i>g</i>,<i>r</i>}</td></tr>
+<tr><td></td><td>{¬<i>g</i>, ¬<i>f</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>Note that, even though the sentences in these two examples are similar to start with (disagreeing on just one ¬ operator), the results are quite different.</p>
+
+<!--=======================================================================-->
+
+<h3>5.3 <a name="section_05_03">Resolution Principle</a></h3>
+
+<p>The idea of Propositional Resolution is simple.  Suppose we have the clause {<i>p</i>, <i>q</i>}.  In other words, we know that <i>p</i> is true or <i>q</i> is true.  Suppose we also have the clause {¬<i>q</i>, <i>r</i>}.  In other words, we know that <i>q</i> is false or <i>r</i> is true.  One clause contains <i>q</i>, and the other contains ¬<i>q</i>.  If <i>q</i> is false, then by the first clause <i>p</i> must be true.  If <i>q</i> is true, then, by the second clause, <i>r</i> must be true.  Since <i>q</i> must be either true or false, then it must be the case that either <i>p</i> is true or <i>r</i> is true.  So we should be able to derive the clause {<i>p</i>, <i>r</i>}.</p>
+
+<p>This intuition is the basis for the rule of inference shown below.  Given a clause containing a literal &#967; and another clause containing the literal ¬&#967;, we can infer the clause consisting of all the literals of both clauses without the complementary pair.  This rule of inference is called <i>Propositional Resolution</i> or the <i>Resolution Principle</i>.</p>
+
+<center>
+<table>
+<tbody><tr><td>{&#966;<sub>1</sub>, ... , &#967;, ... , &#966;<sub><i>m</i></sub>}</td></tr>
+<tr><td>{&#968;<sub>1</sub>, ... , ¬&#967;, ... , &#968;<sub><i>n</i></sub>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{&#966;<sub>1</sub>, ... , &#966;<sub><i>m</i></sub>, &#968;<sub>1</sub>, ..., &#968;<sub><i>n</i></sub>}</td></tr>
+</tbody></table>
+</center>
+
+<p>The case we just discussed is an example.  If we have the clause {<i>p</i>, <i>q</i>} and we also have the clause {¬<i>q</i>, <i>r</i>}, then we can derive the clause {<i>p</i>, <i>r</i>} in a single step.</p>
+
+<center>
+<table>
+<tbody><tr><td>{<i>p</i>, <i>q</i>}</td></tr>
+<tr><td>{¬<i>q</i>, <i>r</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{<i>p</i>, <i>r</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>Note that, since clauses are sets, there cannot be two occurrences of any literal in a clause.  Therefore, in drawing a conclusion from two clauses that share a literal, we merge the two occurrences into one, as in the following example.</p>
+
+<center>
+<table>
+<tbody><tr><td>{¬<i>p</i>, <i>q</i>}</td></tr>
+<tr><td>{<i>p</i>, <i>q</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{<i>q</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>If either of the clauses is a singleton set, we see that the number of literals in the result is less than the number of literals in the other clause.  For example, from the clause {<i>p</i>, <i>q</i>, <i>r</i>} and the singleton clause {¬<i>p</i>}, we can derive the shorter clause {<i>q</i>, <i>r</i>}.</p>
+
+<center>
+<table>
+<tbody><tr><td>{<i>p</i>, <i>q</i>, <i>r</i>}</td></tr>
+<tr><td>{¬<i>p</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{<i>q</i>, <i>r</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>Resolving two singleton clauses leads to the <i>empty clause</i>; i.e. the clause consisting of no literals at all, as shown below.  The derivation of the empty clause means that the database contains a contradiction.</p>
+
+<center>
+<table>
+<tbody><tr><td>{<i>p</i>}</td></tr>
+<tr><td>{¬<i>p</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{}</td></tr>
+</tbody></table>
+</center>
+
+<p>If two clauses resolve, they may have more than one resolvent because there can be more than one way in which to choose the resolvents.  Consider the following deductions.</p>
+
+<center>
+<table>
+<tbody><tr><td>{<i>p</i>, <i>q</i>}</td></tr>
+<tr><td>{¬<i>p</i>, ¬<i>q</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{<i>p</i>, ¬<i>p</i>}</td></tr>
+<tr><td>{<i>q</i>, ¬<i>q</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>Note, however, when two clauses have multiple pairs of complementary literals, only <i>one pair</i> of literals may be resolved at a time.  For example, the following is <i>not</i> a legal application of Propositional Resolution.</p>
+<p></p>
+
+<center>
+<table><tbody><tr>
+<td>
+<table>
+<tbody><tr><td>{<i>p</i>, <i>q</i>}</td></tr>
+<tr><td>{¬<i>p</i>, ¬<i>q</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{}</td></tr>
+</tbody></table>
+</td>
+<td width="40" align="center" valign="center">
+Wrong!
+</td>
+</tr></tbody></table>
+</center>
+
+<p>If we were to allow this to go through, we would be saying that these two clauses are inconsistent.  However, it is perfectly possible for (<i>p</i> &#8744; <i>q</i>) to be true and (¬<i>p</i> &#8744; ¬<i>q</i>) to be true at the same time.  For example, we just let <i>p</i> be true and <i>q</i> be false, and we have satisfied both clauses.</p>
+
+<p>It is noteworthy that resolution subsumes many of our other rules of inference.  Consider, for example, Implication Elimination, shown below on the left.  If we have (<i>p</i> &#8658; <i>q</i>) and we have <i>p</i>, then we can deduce <i>q</i>.  The clausal form of the premises and conclusion are shown below on the right.  The implication (<i>p</i> &#8658; <i>q</i>) corresponds to the clause {¬<i>p</i>, <i>q</i>}, and <i>p</i> corresponds to the singleton clause {<i>p</i>}.  We have two clauses with a complementary literal, and so we cancel the complementary literals and derive the clause {<i>q</i>}, which is the clausal form of <i>q</i>.</p>
+<p></p>
+
+<center>
+<table>
+<tbody><tr>
+<td width="200" align="center">
+<table>
+<tbody><tr><td><i>p</i> &#8658; <i>q</i></td></tr>
+<tr><td><i>p</i></td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td><i>q</i></td></tr>
+</tbody></table>
+</td>
+<td width="200" align="center">
+<table>
+<tbody><tr><td>{¬<i>p</i>, <i>q</i>}</td></tr>
+<tr><td>{<i>p</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{<i>q</i>}</td></tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+</center>
+
+<p>As another example, recall the example of formal reasoning introduced in Chapter 1.  We said that, whenever we have two rules in which the left hand side of one contains a proposition constant that occurs on the right hand side of the other, then we can cancel those constants and deduce a new rule by combining the remaining constants on the left hand sides of both rules and the remaining constants on the right hand sides of both rules.  As it turns out, this is just Propositional Resolution.</p>
+
+<p>Recall that we illustrated this rule with the deduction shown below on the left.  Given  (<i>m</i> &#8658; <i>p</i> &#8744; <i>q</i>) and (<i>p</i> &#8658; <i>q</i>), we deduce (<i>m</i> &#8658; <i>q</i>).   On the right, we have the clausal form of the sentences on the left.  In place of the first sentence, we have the clause {¬<i>m</i>, <i>p</i>, <i>q</i>}; and, in place of the second sentence, we have {¬<i>p</i>, <i>q</i>}.  Using resolution, we can deduce {¬<i>m</i>, <i>q</i>}, which is the clausal form of the sentence we derived on the left.</p>
+
+<center>
+<table>
+<tbody><tr>
+<td width="200" align="center">
+<table>
+<tbody><tr><td><i>m</i> &#8658; <i>p</i> &#8744;<i>q</i></td></tr>
+<tr><td><i>p</i> &#8658; <i>q</i></td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td><i>m</i> &#8658; <i>q</i></td></tr>
+</tbody></table>
+</td>
+<td width="200" align="center">
+<table>
+<tbody><tr><td>{¬<i>m</i>, <i>p</i>, <i>q</i>}</td></tr>
+<tr><td>{¬<i>p</i>, <i>q</i>}</td></tr>
+<tr height="1"><td bgcolor="#333333" colspan="3" nowrap=""></td></tr>
+<tr><td>{¬<i>m</i>, <i>q</i>}</td></tr>
+</tbody></table>
+</td>
+</tr>
+</tbody></table>
+</center>
+
+<!--=======================================================================-->
+
+<h3>5.4 <a name="section_05_04">Resolution Reasoning</a></h3>
+
+<p>Reasoning with the Resolution Principle is analogous to reasoning with other rules of inference.  We start with premises; we apply the Resolution Principle to those premises; we apply the rule to the results of those applications; and so forth until we get to our desired conclusion or we run out of things to do.</p>
+
+<p>Formally, we define a <i>resolution derivation</i> of a conclusion from a set of premises to be a finite sequence of clauses terminating in the conclusion in which each clause is either a premise or the result of applying the Resolution Principle to earlier members of the sequence.</p>
+
+<p>Note that our definition of resolution derivation is analogous to our definition of linear proof.  However, in this case, we do not use the word <i>proof</i>, because we reserve that word for a slightly different concept, which is discussed below.</p>
+
+<p>In many cases, it is possible to find resolution derivations of conclusions from premises.  Suppose, for example, we are given the clauses {¬<i>p</i>, <i>r</i>} and {¬<i>q</i>, <i>r</i>} and {<i>p</i>, <i>q</i>}.  Then we can derive the conclusion {<i>r</i>} as shown below.</p>
+
+<center>
+<table>
+<tbody><tr><td>1.</td><td>{¬<i>p</i>, <i>r</i>}</td><td>Premise</td></tr>
+<tr><td>2.</td><td>{¬<i>q</i>, <i>r</i>}</td><td>Premise</td></tr>
+<tr><td>3.</td><td>{<i>p</i>, <i>q</i>}</td><td>Premise</td></tr>
+<tr><td>4.</td><td>{<i>q</i>, <i>r</i>}</td><td>1, 3</td></tr>
+<tr><td>5.</td><td>{<i>r</i>}</td><td>2, 4</td></tr>
+</tbody></table>
+</center>
+
+<p>It is noteworthy that the resolution is not <i>generatively complete</i>, i.e. it is not possible to find resolution derivations for all clauses that are logically entailed by a set of premise clauses.</p>
+
+<p>For example, given the clause {<i>p</i>} and the clause {<i>q</i>}, there is no resolution derivation of {<i>p</i>, <i>q</i>}, despite the fact that it is logically entailed by the premises in this case.</p>
+
+<p>As another example, consider that valid clauses (such as {<i>p</i>, ¬<i>p</i>}) are always true, and so they are logically entailed by any set of premises, including the empty set.  However, Propositional Resolution requires some premises to have any effect.  Given an empty set of premises, we would not be able to derive any conclusions, including these valid clauses.</p>
+
+<p>On the other hand, we can be sure of one thing.  If a set &#916; of clauses is unsatisfiable, then there is guaranteed to be a resolution derivation of the empty clause from &#916;.  More generally, if a set &#916; of Propositional Logic sentences is unsatisfiable, then there is guaranteed to be a resolution derivation of the empty clause from the clausal form of &#916;.</p>
+
+<p>As an example, consider the clauses {<i>p</i>, <i>q</i>}, {<i>p</i>, ¬<i>q</i>}, {¬<i>p</i>, <i>q</i>}, and {¬<i>p</i>, ¬<i>q</i>}.  There is no truth assignment that satisfies all four of these clauses.  Consequently, starting with these clauses, we should be able to derive the empty clause; and we can.  A resolution derivation is shown below.</p>
+
+<center>
+<table>
+<tbody><tr><td>1.</td><td>{<i>p</i>, <i>q</i>}</td><td>Premise</td></tr>
+<tr><td>2.</td><td>{<i>p</i>, ¬<i>q</i>}</td><td>Premise</td></tr>
+<tr><td>3.</td><td>{¬<i>p</i>, <i>q</i>}</td><td>Premise</td></tr>
+<tr><td>4.</td><td>{¬<i>p</i>, ¬<i>q</i>}</td><td>Premise</td></tr>
+<tr><td>5.</td><td>{<i>p</i>}</td><td>1, 2</td></tr>
+<tr><td>6.</td><td>{¬<i>p</i>}</td><td>3, 4</td></tr>
+<tr><td>7.</td><td>{}</td><td>5, 6</td></tr>
+</tbody></table>
+</center>
+
+<p>The good news is that we can use the relationship between unsatisfiability and logical entailment to produce a method for determining logical entailment as well.  Recall that the Unsatisfiability Theorem introduced in Chapter 3 tells that a set &#916; of sentences logically entails a sentence &#966; if and only if the set of sentences &#916;&#8746;{¬&#966;} is inconsistent.  So, to determine logical entailment, all we need to do is to negate our goal, add it to our premises, and use Resolution to determine whether the resulting set is unsatisfiable.</p>
+
+<p>Let's capture this idea with some definitions.  A <i>resolution proof</i> of a sentence &#966; from a set &#916; of sentences is a resolution derivation of the empty clause from the clausal form of &#916; &#8746; {¬&#966;}.   A sentence &#966; is <i>provable</i> from a set of sentences &#916; by Propositional Resolution (written &#916; |- &#966;) if and only if there is a resolution proof of &#966; from &#916;.</p>
+
+<p>As an example of a resolution proof, consider one of the problems we saw earlier.  We have three premises - <i>p</i>, (<i>p</i> &#8658; <i>q</i>), and (<i>p</i> &#8658; <i>q</i>) &#8658; (<i>q</i> &#8658; <i>r</i>).  Our job is to prove <i>r</i>.  A resolution proof is shown below.  The first two clauses in the proof correspond to the first two premises of the problem.  The third and fourth clauses in the proof correspond to the third premise.  The fifth clause comes from the negation of the goal.  Resolving the first clause with the second, we get the clause <i>q</i>, shown on line 6.  Resolving this with the fourth clause gives us <i>r</i>.  And resolving this with the clause on line 5 gives us the empty clause.</p>
+
+<center>
+<table>
+<tbody><tr><td>1.</td><td>{<i>p</i>}</td><td>Premise</td></tr>
+<tr><td>2.</td><td>{¬<i>p</i>, <i>q</i>}</td><td>Premise</td></tr>
+<tr><td>3.</td><td>{<i>p</i>, ¬<i>q</i>, <i>r</i>}</td><td>Premise</td></tr>
+<tr><td>4.</td><td>{¬<i>q</i>, <i>r</i>}</td><td>Premise</td></tr>
+<tr><td>5.</td><td>{¬<i>r</i>}</td><td>Premise</td></tr>
+<tr><td>6.</td><td>{<i>q</i>}</td><td>1, 2</td></tr>
+<tr><td>7.</td><td>{<i>r</i>}</td><td>4, 6</td></tr>
+<tr><td>8.</td><td>{}</td><td>5, 7</td></tr>
+</tbody></table>
+</center>
+
+<p>Here is another example, this time illustrating the way in which we can use Resolution to prove valid sentences.  Let's say that we have no premises at all and we want to prove (<i>p</i> &#8658; (<i>q</i> &#8658; <i>p</i>)), an instance of the Implication Creation axiom schema.</p>
+
+<p>The first step is to negate this sentence and convert to clausal form.  A trace of the conversion process is shown below.  Note that we end up with three clauses.</p>
+
+<center>
+<table>
+<tbody><tr><td width="20"></td><td>¬(<i>p</i> &#8658; (<i>q</i> &#8658; <i>p</i>))</td></tr>
+<tr><td>I</td><td>¬(¬<i>p</i> &#8744; (¬<i>q</i> &#8744; <i>p</i>))</td></tr>
+<tr><td>N</td><td>¬¬<i>p</i> &#8743; ¬(¬<i>q</i> &#8744; <i>p</i>)</td></tr>
+<tr><td></td><td><i>p</i> &#8743; (¬¬<i>q</i> &#8743; ¬<i>p</i>)</td></tr>
+<tr><td>D</td><td><i>p</i> &#8743; <i>q</i> &#8743; ¬<i>p</i></td></tr>
+<tr><td>O</td><td>{<i>p</i>}</td></tr>
+<tr><td></td><td>{<i>q</i>}</td></tr>
+<tr><td></td><td>{¬<i>p</i>}</td></tr>
+</tbody></table>
+</center>
+
+<p>Finally, we take these clauses and produce a resolution derivation of the empty clause in one step.</p>
+
+<center>
+<table>
+<tbody><tr><td>1.</td><td>{<i>p</i>}</td><td>Premise</td></tr>
+<tr><td>2.</td><td>{<i>q</i>}</td><td>Premise</td></tr>
+<tr><td>3.</td><td>{¬<i>p</i>}</td><td>Premise</td></tr>
+<tr><td>4.</td><td>{}</td><td>1, 3</td></tr>
+</tbody></table>
+</center>
+
+<p>One of the best features of Propositional Resolution is that it much more focussed than the other proof methods we have seen.  There is no need to choose instantiations carefully or to search through infinitely many possible instantiations for rules of inference.</p>
+
+<p>Moreover, unlike the other methods we have seen, Propositional Resolution can be used in a proof procedure that always terminates without losing completeness.  Since there are only finitely many clauses that can be constructed from a finite set of proposition constants, the procedure eventually runs out of new conclusions to draw, and when this happens we can terminate our search for a proof.</p>
+
+<!--=======================================================================-->
+
+<h3>Recap</h3>
+
+<p><i>Propositional Resolution</i> is a rule of inference for Propositional Logic.  Propositional Resolution works only on expressions in <i>clausal form</i>.  A <i>literal</i> is either an atomic sentence or a negation of an atomic sentence.  A <i>clausal sentence</i> is either a literal or a disjunction of literals.  A <i>clause</i> is the set of literals in a clausal sentence.  The empty set {} is also a clause; it is equivalent to an empty disjunction and, therefore, is unsatisfiable.  Given a clause containing a literal &#967; and another clause containing the literal ¬&#967;, we can infer the clause consisting of all the literals of both clauses without the complementary pair.  This rule of inference is called <i>Propositional Resolution</i> or the <i>Resolution Principle</i>.  A <i>resolution derivation</i> of a conclusion from a set of premises is a finite sequence of clauses terminating in the conclusion in which each clause is either a premise or the result of applying the Resolution Principle to earlier members of the sequence.  A <i>resolution proof</i> of a sentence &#966; from a set &#916; of sentences is a resolution derivation of the empty clause from the clausal form of &#916; &#8746; {¬&#966;}.   A sentence &#966; is <i>provable</i> from a set of sentences &#916; by Propositional Resolution (written &#916; |- &#966;) if and only if there is a resolution proof of &#966; from &#916;.  Resolution is not <i>generatively complete</i>, i.e. it is not possible to find resolution derivations for all clauses that are logically entailed by a set of premise clauses.  On the other hand, it is <i>complete</i> in another sense - if a set &#916; of clauses is unsatisfiable, then there is guaranteed to be a resolution derivation of the empty clause from &#916;.  More generally, if a set &#916; of Propositional Logic sentences is unsatisfiable, then there is guaranteed to be a resolution derivation of the empty clause from the clausal form of &#916;.  Propositional Resolution can be used in a proof procedure that always terminates without losing completeness.</p>
+
+<!--=======================================================================-->
+
+<h3>Exercises</h3>
+
+<p><a href="http://logic.stanford.edu/intrologic/exercises/exercise_05_01.html" style="color:#6666ff;cursor:pointer;text-decoration:none">Exercise 5.1:</a>  Convert the following sentences to clausal form.
+<table>
+  <tbody><tr><td width="20"></td><td width="20">(<i>a</i>)</td><td><i>p</i> &#8743; <i>q</i> &#8658; <i>r</i> &#8744; <i>s</i></td></tr>
+  <tr><td width="20"></td><td width="20">(<i>b</i>)</td><td><i>p</i> &#8744; <i>q</i> &#8658; <i>r</i> &#8744; <i>s</i></td></tr>
+  <tr><td width="20"></td><td width="20">(<i>c</i>)</td><td>¬(<i>p</i> &#8744; <i>q</i> &#8744; <i>r</i>)</td></tr>
+  <tr><td width="20"></td><td width="20">(<i>d</i>)</td><td>¬(<i>p</i> &#8743; <i>q</i> &#8743; <i>r</i>)</td></tr>
+  <tr><td width="20"></td><td width="20">(<i>e</i>)</td><td><i>p</i> &#8743; <i>q</i> &#8660; <i>r</i></td></tr>
+</tbody></table></p>
+
+<p><a href="http://logic.stanford.edu/intrologic/exercises/exercise_05_02.html" style="color:#6666ff;cursor:pointer;text-decoration:none">Exercise 5.2:</a> What are the results of applying Propositional Resolution to the following pairs of clauses.
+<table>
+  <tbody><tr><td width="20"></td><td width="20">(<i>a</i>)</td><td>{<i>p</i>, <i>q</i>, ¬<i>r</i>} and {<i>r</i>, <i>s</i>}</td></tr>
+  <tr><td width="20"></td><td width="20">(<i>b</i>)</td><td>{<i>p</i>, <i>q</i>, <i>r</i>} and {<i>r</i>, ¬<i>s</i>, ¬<i>t</i>}</td></tr>
+  <tr><td width="20"></td><td width="20">(<i>c</i>)</td><td>{<i>q</i>, ¬<i>q</i>} and {<i>q</i>, ¬<i>q</i>}</td></tr>
+  <tr><td width="20"></td><td width="20">(<i>d</i>)</td><td>{¬<i>p</i>, <i>q</i>, <i>r</i>} and {<i>p</i>, ¬<i>q</i>, ¬<i>r</i>}</td></tr>
+</tbody></table></p>
+
+<p><a href="http://logic.stanford.edu/intrologic/exercises/exercise_05_03.html" style="color:#6666ff;cursor:pointer;text-decoration:none">Exercise 5.3:</a> Use Propositional Resolution to show that the clauses {<i>p</i>, <i>q</i>}, {¬<i>p</i>, <i>r</i>}, {¬<i>p</i>, ¬<i>r</i>}, {<i>p</i>, ¬<i>q</i>} are not simultaneously satisfiable.</p>
+
+<p><a href="http://logic.stanford.edu/intrologic/exercises/exercise_05_04.html" style="color:#6666ff;cursor:pointer;text-decoration:none">Exercise 5.4:</a> Given the premises (<i>p</i> &#8658; <i>q</i>) and (<i>r</i> &#8658; <i>s</i>), use Propositional Resolution to prove the conclusion (<i>p</i> &#8744; <i>r</i> &#8658; <i>q</i> &#8744; <i>s</i>).</p>
+
+<!--=======================================================================-->
+
+        </td>
+      </tr>
+    </tbody></table>
+  </center>
+
+
+
+</body></html>
